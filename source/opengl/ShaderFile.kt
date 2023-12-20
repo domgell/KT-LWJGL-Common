@@ -50,3 +50,10 @@ fun createGeometryShader(shaderFileName: String, shaderProgramHandle: Int): Int 
     initializeShader(handle, shaderFileName, shaderProgramHandle)
     return handle
 }
+
+fun createShaderProgram(vertexShader: String, pixelShader: String): Int {
+    val program = GL40.glCreateProgram()
+    createVertexShader(vertexShader, program)
+    createPixelShader(pixelShader, program)
+    return program
+}

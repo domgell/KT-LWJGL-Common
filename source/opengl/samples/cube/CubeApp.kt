@@ -11,7 +11,7 @@ import java.awt.Color
 
 const val RESOURCES_SHADER_PATH = "/home/dom/dev/projects/git/LWJGL/KT-LWJGL-Common/source/opengl/samples/cube/shaders/"
 
-class AppGL : App() {
+class CubeApp : App() {
     override fun init() {
         // Initialize GL
         GL.createCapabilities()

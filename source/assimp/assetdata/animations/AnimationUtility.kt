@@ -1,6 +1,8 @@
 package assetdata.animations
 
 import assetdata.meshes.AnimationData
+import assimp.assetdata.animations.BoneAnimation
+import assimp.assetdata.animations.MeshAnimation
 import org.joml.Vector4f
 import org.joml.Vector4i
 import org.lwjgl.assimp.*
@@ -17,7 +19,7 @@ internal val AINodeAnim.name: String
 
 internal fun AINode.foreachChild(action: (AINode) -> Unit) {
     action(this)
-    for (i in 0 until this.mNumChildren())
+    for (i in 0..<this.mNumChildren())
         AINode.create(this.mChildren()!![i]).foreachChild(action)
 }
 
@@ -34,29 +36,18 @@ private fun AINodeAnim.getScaleKeys(): Array<AIVectorKey> = Array(mNumScalingKey
 
 // Extract all animation data for each bone
 private fun createBoneAnimations(bones: List<BoneNode>, channels: Array<AINodeAnim>): List<BoneAnimation> {
-    /*
-    return List(channels.size) { i ->
-        val channel = channels[i]
-        val bone = bones.find { it.name == channel.name }
-            ?: throw IllegalArgumentException("The channel '${channel.name}' has no equivalent bone")
-
-        BoneAnimation(
-            bone.index, channel.getPositionKeys().map { it.toKeyFrame() },
-            channel.getRotationKeys().map { it.toKeyFrame() },
-            channel.getScaleKeys().map { it.toKeyFrame() }
-        )
-    }*/
-
     val boneAnimations = ArrayList<BoneAnimation>()
 
     channels.forEach { channel ->
         val bone = bones.find { it.name == channel.name }
         if (bone != null)
             boneAnimations.add(
-                BoneAnimation(bone.index, channel.getPositionKeys().map { it.toKeyFrame() },
-                    channel.getRotationKeys().map { it.toKeyFrame() },
-                    channel.getScaleKeys().map { it.toKeyFrame() }
-                ))
+                BoneAnimation(
+                    bone.name, channel.getPositionKeys().map { it.toKeyFrame() }.toTypedArray(),
+                    channel.getRotationKeys().map { it.toKeyFrame() }.toTypedArray(),
+                    channel.getScaleKeys().map { it.toKeyFrame() }.toTypedArray()
+                )
+            )
     }
 
     return boneAnimations
@@ -79,16 +70,20 @@ internal fun AIMesh.createAnimData(aiScene: AIScene): AnimationData? {
 
     val (weights, boneInfluences) = getBoneWeightData(aiBones, this.mNumVertices())
 
-    return AnimationData(bones.toTypedArray(), animations.toTypedArray(), weights.toTypedArray(), boneInfluences.toTypedArray())
+    return AnimationData(
+        bones.toTypedArray(),
+        animations.toTypedArray(),
+        weights.toTypedArray(),
+        boneInfluences.toTypedArray()
+    )
 }
 
-// TODO Refactor
 private fun getBoneWeightData(aiBones: List<AIBone>, numVertices: Int): Pair<List<Vector4f>, List<Vector4i>> {
     val numBoneInfluences = Array(numVertices) { 0 }
-    
+
     val vertexWeights = List(numVertices) { Vector4f(0f) }
     val boneInfluences = List(numVertices) { Vector4i(-1) }
-    
+
     aiBones.forEachIndexed { boneIndex, bone ->
         bone.mWeights().forEach { weightData ->
             val weight = weightData.mWeight()
@@ -116,10 +111,6 @@ private fun getBoneWeightData(aiBones: List<AIBone>, numVertices: Int): Pair<Lis
                     vertexWeights[vertexID].w = weight
                     boneInfluences[vertexID].w = boneIndex
                 }
-
-                else -> println(
-                    "More than 4 bone influences (${numBoneInfluences[vertexID]}) on vertex $vertexID"
-                )
             }
         }
     }

@@ -4,10 +4,13 @@ import application.App
 import input.MouseButtons
 import input.bind
 import input.getMovementInput
+import math.FMath.radians
+import org.joml.Vector3f
 
-class CameraController : Camera() {
-
-    private val mouseSensitivity = 0.65f
+class CameraController {
+    val camera = Camera()
+    
+    private val mouseSensitivity = 0.065f
     private val movementSpeed = 7.5f
 
     init {
@@ -22,17 +25,21 @@ class CameraController : Camera() {
                 return@onMove
 
             // Apply look input
-            yaw += mouseDelta.x * -0.001f * mouseSensitivity
-            pitch += mouseDelta.y * -0.001f * mouseSensitivity
+            yaw += mouseDelta.x * mouseSensitivity
+            pitch += mouseDelta.y * mouseSensitivity
 
-            rotation.rotationXYZ(pitch, yaw, 0f)
+            camera.rotation.rotationXYZ(-pitch.radians, -yaw.radians, 0f)
         }
 
-        App.onUpdate {
-            // Add movement input rotated by yaw
-            //camera.location.add(getMovementInput().mul(movementSpeed).rotateY(-yaw))
-
-            location.add(getMovementInput().mul(movementSpeed * it).rotateX(-pitch).rotateY(-yaw))
+        val movement = Vector3f()
+        
+        App.onUpdate { deltaTime ->
+            movement.set(getMovementInput())
+                .mul(movementSpeed * deltaTime)
+                .rotateX(-pitch.radians) // Remove pitch rotation for non-flying controllers
+                .rotateY(yaw.radians)
+            
+            camera.location.add(movement)
         }
     }
 }

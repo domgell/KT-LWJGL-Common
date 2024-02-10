@@ -1,25 +1,40 @@
 package input
 
 import application.App
+import math.FMath.isNearlyZero
+import math.component1
+import math.component2
+import org.joml.Vector2f
+import org.joml.Vector2fc
 import org.joml.Vector3f
+import org.joml.Vector3fc
 import org.lwjgl.glfw.GLFW
 
-private val v = Vector3f()
-fun getMovementInput(): Vector3f {
-    v.set(0f, 0f, 0f)
+//private val v = Vector3f()
+private val movement = Vector3f()
+fun getMovementInput(): Vector3fc {
+    val (x, y) = getInputVector(Keys.W, Keys.S, Keys.A, Keys.D)
+    movement.x = x
+    movement.z = y
+    return movement
+}
 
-    if (Keys.W.isDown)
-        v.z++
-    if (Keys.A.isDown)
+private val v = Vector2f()
+fun getInputVector(up: Keys, down: Keys, left: Keys, right: Keys): Vector2fc {
+    v.set(0f)
+    
+    if (up.isDown)
+        v.y++
+    if (down.isDown)
+        v.y--
+    if (left.isDown)
         v.x++
-    if (Keys.S.isDown)
-        v.z--
-    if (Keys.D.isDown)
+    if (right.isDown)
         v.x--
-
-    if (v.length() != 0f)
+    
+    if (v.length() > 0f)
         v.normalize()
-
+    
     return v
 }
 

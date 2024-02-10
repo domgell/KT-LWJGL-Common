@@ -19,13 +19,13 @@ class CubeApp : App() {
         glEnable(GL_DEPTH_TEST)
 
         // Camera
-        val cam = CameraController()
+        val cam = CameraController().camera
         cam.location.set(0f, -1f, -5f)
 
         // Shaders
         val meshShader = glCreateProgram()
-        createVertexShader(RESOURCES_SHADER_PATH + "Mesh.vert", meshShader)
-        createPixelShader(RESOURCES_SHADER_PATH + "Mesh.frag", meshShader)
+        createVertexShader_OLD(RESOURCES_SHADER_PATH + "Mesh.vert", meshShader)
+        createPixelShader_OLD(RESOURCES_SHADER_PATH + "Mesh.frag", meshShader)
         
         // Cube mesh
         val cube = Mesh(CubeData.indices, CubeData.positions).also { it.color = Color.green }
@@ -37,7 +37,7 @@ class CubeApp : App() {
             mesh.use()
 
             setUniform(mesh.transform, getUniform("world", meshShader))
-            setUniform(cam.viewProjection, getUniform("viewProjection", meshShader))
+            setUniform(cam.getViewProjection(), getUniform("viewProjection", meshShader))
             setUniform(mesh.color.toNormalizedColor(), getUniform("color", meshShader))
 
             drawElements(mesh.indices.size, mesh.drawMode)

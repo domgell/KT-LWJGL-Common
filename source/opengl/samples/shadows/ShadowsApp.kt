@@ -12,7 +12,12 @@ import rendering.camera.CameraController
 import rendering.toNormalizedColor
 import java.awt.Color
 
-const val RESOURCES_SHADER_PATH = "/home/dom/dev/projects/git/LWJGL/KT-LWJGL-Common/source/opengl/samples/shadows/shaders/"
+const val RESOURCES_SHADER_PATH =
+    "/home/dom/dev/projects/git/LWJGL/KT-LWJGL-Common/source/opengl/samples/shadows/shaders/"
+
+fun main() {
+    ShadowsApp()
+}
 
 class ShadowsApp : App() {
     override fun init() {
@@ -22,30 +27,35 @@ class ShadowsApp : App() {
         glEnable(GL_DEPTH_TEST)
 
         // Camera
-        val cam = CameraController()
+        val cam = CameraController().camera
         cam.location.set(0f, -1f, -5f)
 
         // Shaders
         val meshShader = glCreateProgram()
-        createVertexShader(RESOURCES_SHADER_PATH + "Mesh.vert", meshShader)
-        createPixelShader(RESOURCES_SHADER_PATH + "Mesh.frag", meshShader)
-        
+        createVertexShader_OLD(RESOURCES_SHADER_PATH + "Mesh.vert", meshShader)
+        createPixelShader_OLD(RESOURCES_SHADER_PATH + "Mesh.frag", meshShader)
+
         // Cube mesh
         val cube = Mesh(CubeData.indices, CubeData.positions).also { it.color = Color.green }
 
         // Floor mesh
-        val floor = Mesh(CubeData.indices, CubeData.positions).also { it.transform.translate(0f, -1f, 0f).scale(5f, 0.05f, 5f) }
-        
+        val floor = Mesh(CubeData.indices, CubeData.positions).also { 
+            it.transform.translate(0f, -1f, 0f).scale(5f, 0.05f, 5f) 
+        }
+
         // Light
         val light = DirectionalLight().also { it.position.set(3f) }
-        val lightMesh = Mesh(CubeData.indices, CubeData.positions).also { it.color = Color.white; it.transform.translate(light.position).scale(0.1f) }
-        
+        val lightMesh = Mesh(CubeData.indices, CubeData.positions).also {
+            it.color = Color.white; it.transform.translate(light.position).scale(0.1f)
+        }
+
         // Shadow map
         val shadowMap = ShadowMap()
-        
+
         // Depth shader
-        val depthShader = createShaderProgram(RESOURCES_SHADER_PATH + "Depth.vert", RESOURCES_SHADER_PATH + "Depth.frag")
-        
+        val depthShader =
+            createShaderProgram(RESOURCES_SHADER_PATH + "Depth.vert", RESOURCES_SHADER_PATH + "Depth.frag")
+
         // Set shadow map uniform on meshShader
         setUniform(0, getUniform("shadowMap", meshShader))
 
@@ -77,11 +87,11 @@ class ShadowsApp : App() {
             glBindFramebuffer(GL_FRAMEBUFFER, 0)
             glCullFace(GL_BACK)
         }
-        
+
         onDraw {
             glUseProgram(depthShader)
             shadowPass(light.getLightSpace(), depthShader, shadowMap, cube, floor)
-            
+
             // Render normally
             glViewport(0, 0, width, height)
             glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
@@ -90,15 +100,14 @@ class ShadowsApp : App() {
             glBindTexture(GL_TEXTURE_2D, shadowMap.depthMap)
             setUniform(light.getLightSpace(), getUniform("lightSpace", meshShader))
 
-            setUniform(cam.viewProjection, getUniform("viewProjection", meshShader))
+            setUniform(cam.getViewProjection(), getUniform("viewProjection", meshShader))
             drawMesh(cube)
             drawMesh(floor)
             drawMesh(lightMesh)
         }
     }
 
-    
-    
+
     override fun update() {
         glClear(GL_COLOR_BUFFER_BIT or GL_DEPTH_BUFFER_BIT)
 

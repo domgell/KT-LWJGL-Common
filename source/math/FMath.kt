@@ -2,6 +2,7 @@ package math
 
 import kotlin.math.PI
 import kotlin.math.absoluteValue
+import kotlin.random.Random
 
 object FMath {
     val Float.radians: Float
@@ -26,4 +27,16 @@ object FMath {
     }
     
     fun Float.isNearlyZero(tolerance: Float = 0.0001f) = this.isNearlyEqual(0f, tolerance)
+
+    fun lerp(value: Float, target: Float, alpha: Float): Float {
+        return value + (target - value) * alpha
+    }
+    
+    fun random(min: Float, max: Float): Float {
+        return Random.nextFloat() * (max - min) + min
+    }
+    
+    fun perlinNoise(min: Float, max: Float, deltaTime: Float) {
+        TODO()
+    }
 }

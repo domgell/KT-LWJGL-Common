@@ -1,22 +1,27 @@
 package application
 
-class MyEvent<T> {
+class MyEvent<T> : Disposable {
     private val callbacks = ArrayList<(T) -> Unit>()
-
+    
     // Bind new callback
-    operator fun invoke(callback: (T) -> Unit): Int {
+    operator fun invoke(callback: (T) -> Unit): Disposable {
         callbacks.add(callback)
-        return callbacks.lastIndex
+        
+        return object : Disposable {
+            val index = callbacks.lastIndex
+            
+            override fun dispose() {
+                callbacks.removeAt(index)
+            }
+        }
     }
 
     // Call all callbacks with the given variable
     operator fun invoke(variable: T) {
         callbacks.forEach { it(variable) }
     }
-    
-    fun remove(index: Int) {
-        callbacks.removeAt(index)
-    }
+
+    override fun dispose() = callbacks.clear()
 }
 
 // Simplified invoke call for Unit events

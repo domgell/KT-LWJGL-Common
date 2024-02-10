@@ -1,9 +1,7 @@
 package assimp.utility
 
-import assetdata.animations.KeyFrame
-import org.joml.Matrix4f
-import org.joml.Quaternionf
-import org.joml.Vector3f
+import assimp.assetdata.animations.KeyFrame
+import org.joml.*
 import org.lwjgl.assimp.*
 
 fun AIMatrix4x4.toMatrix4f(): Matrix4f {
@@ -25,8 +23,8 @@ fun AIMatrix4x4.toMatrix4f(): Matrix4f {
 
 fun AIVector3D.toVector3f(): Vector3f = Vector3f(x(), y(), z())
 
-fun AIQuaternion.toQuaternionf(): Quaternionf = Quaternionf(x(), y(), z(), w())
+fun AIQuaternion.toQuaternionf(): Quaternionfc = Quaternionf(x(), y(), z(), w())
 
-fun AIVectorKey.toKeyFrame(): KeyFrame<Vector3f> = KeyFrame(this.mValue().toVector3f(), this.mTime().toFloat())
+fun AIVectorKey.toKeyFrame(): KeyFrame<Vector3fc> = KeyFrame(this.mValue().toVector3f(), this.mTime().toFloat())
 
-fun AIQuatKey.toKeyFrame(): KeyFrame<Quaternionf> = KeyFrame(this.mValue().toQuaternionf(), this.mTime().toFloat())
+fun AIQuatKey.toKeyFrame(): KeyFrame<Quaternionfc> = KeyFrame(this.mValue().toQuaternionf(), this.mTime().toFloat())

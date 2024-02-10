@@ -1,14 +1,11 @@
 package assetdata.meshes
 
 import assetdata.animations.BoneNode
-import assetdata.animations.MeshAnimation
+import assimp.assetdata.animations.MeshAnimation
 import assetdata.animations.createAnimData
 import org.joml.Vector2f
-import org.joml.Vector2fc
 import org.joml.Vector3f
-import org.joml.Vector3fc
 import org.joml.Vector4f
-import org.joml.Vector4fc
 import org.joml.Vector4i
 import org.lwjgl.assimp.AIMesh
 import org.lwjgl.assimp.AIScene

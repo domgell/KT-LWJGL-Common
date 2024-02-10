@@ -1,6 +1,6 @@
 package assimp.importing
 
-import assetdata.AssimpScene
+import assimp.assetdata.AssimpScene
 import org.lwjgl.assimp.Assimp
 
 private const val importFlags = Assimp.aiProcess_Triangulate or

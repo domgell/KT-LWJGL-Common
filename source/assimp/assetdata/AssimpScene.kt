@@ -1,24 +1,31 @@
-package assetdata
+package assimp.assetdata
 
 import assetdata.meshes.MeshData
-import org.joml.Matrix4f
+import assimp.assetdata.material.TextureData
 import org.lwjgl.assimp.AIMesh
 import org.lwjgl.assimp.AIScene
 import assimp.utility.toMatrix4f
+import org.joml.Matrix4fc
+import org.lwjgl.assimp.AIMaterial
+import org.lwjgl.assimp.AISkeleton
+import org.lwjgl.assimp.AITexture
 
-data class AssimpScene(val globalInverse: Matrix4f, val meshes: List<MeshData>) {
+// TODO: Material for each mesh
+data class AssimpScene(val globalInverse: Matrix4fc, val meshes: List<MeshData>, val textures: List<TextureData>) {
     companion object {
         fun create(aiScene: AIScene): AssimpScene {
             val meshes = List(aiScene.mNumMeshes()) { MeshData.create(AIMesh.create(aiScene.mMeshes()!![it]), aiScene) }
             
-            // TODO Textures
+            val textures = List(aiScene.mNumTextures()) { 
+                val aiTexture = AITexture.create(aiScene.mTextures()!![it])
+                TextureData(aiTexture.mWidth(), aiTexture.mHeight(), aiTexture.pcDataCompressed())
+            }
             
             // Get global inverse transform
             val rootNode = aiScene.mRootNode() ?: throw NullPointerException("Scene has no rootNode")
             val globalInverse = rootNode.mTransformation().toMatrix4f()
-            globalInverse.invert()
             
-            return AssimpScene(globalInverse, meshes)
+            return AssimpScene(globalInverse, meshes, textures)
         }
     }   
 }
